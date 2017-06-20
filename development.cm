@@ -5,5 +5,7 @@ Group is
   src/basis.sig
   src/final.fun
   src/basis/initial.fun
+  src/basis/precedence.sig
+  src/basis/precedence.fun
   src/render/plain_text.sig
   src/render/plain_text.sml
