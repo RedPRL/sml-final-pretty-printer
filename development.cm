@@ -7,5 +7,8 @@ Group is
   src/basis/initial.fun
   src/basis/precedence.sig
   src/basis/precedence.fun
+  src/basis/types/plain.sml
   src/render/plain_text.sig
   src/render/plain_text.sml
+  
+  example.sml
