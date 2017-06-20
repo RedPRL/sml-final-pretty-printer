@@ -25,7 +25,7 @@ struct
   open Kit.Monad
 
   fun >>= (m, f) = 
-    bind f m
+    bind m f
   infix 2 >>=
 
   fun >> (m, n) = 

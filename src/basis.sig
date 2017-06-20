@@ -1,4 +1,4 @@
-signature FPP_BASIS =
+signature FPP_BASIS_TYPES = 
 sig
   type space
   type ann
@@ -16,13 +16,18 @@ sig
     val unit : fmt
     val mul : fmt * fmt -> fmt
   end
+end
+
+signature FPP_BASIS =
+sig
+  include FPP_BASIS_TYPES
 
   structure Monad : 
   sig
     type 'a m
 
     val ret : 'a -> 'a m
-    val bind : ('a -> 'b m) -> 'a m -> 'b m
+    val bind : 'a m -> ('a -> 'b m) -> 'b m
 
     val alt : 'a m * 'a m -> 'a m
     val fail : unit -> 'a m
