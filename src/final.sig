@@ -2,29 +2,29 @@ structure FppTypes =
 struct
   (* Strings or horizontal space to be displayed *)
   datatype 'w chunk = 
-      (* An atomic string. Should not contain formatting spaces or newlines.
-        Semantic/object-level spaces OK, but not newlines. *)
-      TEXT of string
-      (* An amount of horizontal space to insert. *)
-    | SPACE of 'w
+     (* An atomic string. Should not contain formatting spaces or newlines.
+       Semantic/object-level spaces OK, but not newlines. *)
+     TEXT of string
+     (* An amount of horizontal space to insert. *)
+   | SPACE of 'w
 
   (* Atomic pieces of output from the pretty printer *)
   datatype 'w atom = 
-      (* Inclusion of chunks *)
-      CHUNK of 'w chunk
-      (* Newlines to be displayed *)
-    | NEWLINE
+     (* Inclusion of chunks *)
+     CHUNK of 'w chunk
+     (* Newlines to be displayed *)
+   | NEWLINE
 
   (* Pretty printer output represents a single annotated string *)
   datatype ('w, 'ann) output = 
-      (* The empty output *)
-      NULL
-      (* Atomic output *)
-    | ATOM of 'w atom
-      (* An annotated region of output *)
-    | ANN of 'ann * ('w, 'ann) output
-      (* The concatenation of two outputs *)
-    | SEQ of ('w, 'ann) output * ('w, 'ann) output
+     (* The empty output *)
+     NULL
+     (* Atomic output *)
+   | ATOM of 'w atom
+     (* An annotated region of output *)
+   | ANN of 'ann * ('w, 'ann) output
+     (* The concatenation of two outputs *)
+   | SEQ of ('w, 'ann) output * ('w, 'ann) output
 
   type ('w, 'fmt) line = ('w chunk * 'fmt) list
   type ('w, 'fmt) state = {curLine : ('w, 'fmt) line}
@@ -42,30 +42,21 @@ struct
      formatAnn : 'ann -> 'fmt}
 end
 
-
-signature EQ = 
-sig
-  type t 
-  val eq : t * t -> bool
-end
-
-
 signature FPP = 
 sig
   type space
-  type format
   type ann
   type 'a m
 
-  structure Chunk : EQ where type t = space FppTypes.chunk
-  structure Atom : EQ where type t = space FppTypes.atom
+  type chunk = space FppTypes.chunk
+  type atom = space FppTypes.atom
+  type output = (space, ann) FppTypes.output
 
-  structure Out : 
+  structure Output : 
   sig
-    include EQ where type t = (space, ann) FppTypes.output
     val map : ('a -> 'b) -> ('w, 'a) FppTypes.output -> ('w, 'b) FppTypes.output
-    val zer : t
-    val mul : t * t -> t
+    val zer : output
+    val mul : output * output -> output
   end
 
   val grouped : 'a m -> 'a m
@@ -98,21 +89,21 @@ end
 
 signature FPP_BASIS =
 sig
+  type space
+  type ann
+  type fmt
+
   structure Space :
   sig
-    include EQ
-    val compare : t * t -> order
-    val sum : t * t -> t
-    val neg : t -> t
+    val compare : space * space -> order
+    val sum : space * space -> space
+    val neg : space -> space
   end
-
-  structure Ann : EQ
 
   structure Fmt :
   sig
-    include EQ
-    val unit : t
-    val mul : t * t -> t
+    val unit : fmt
+    val mul : fmt * fmt -> fmt
   end
 
   structure Monad : 
@@ -126,12 +117,12 @@ sig
     val fail : unit -> 'a m
 
 
-    type output = (Space.t, Ann.t) FppTypes.output
-    type state = (Space.t, Fmt.t) FppTypes.state
-    type env = (Space.t, Ann.t, Fmt.t) FppTypes.env
-    type line = (Space.t, Fmt.t) FppTypes.line
+    type output = (space, ann) FppTypes.output
+    type state = (space, fmt) FppTypes.state
+    type env = (space, ann, fmt) FppTypes.env
+    type line = (space, fmt) FppTypes.line
 
-    val measure : line -> Space.t m
+    val measure : line -> space m
 
     val output : output -> unit m
     val censor : (output -> output) -> 'a m -> 'a m

@@ -1,42 +1,16 @@
 functor FinalPrettyPrinter (Kit : FPP_BASIS) : FPP = 
 struct
-  type space = Kit.Space.t
-  type format = Kit.Fmt.t
-  type ann = Kit.Ann.t
+  open Kit
   type 'a m = 'a Kit.Monad.m
 
   open FppTypes
 
-  structure Chunk =
+  type chunk = space FppTypes.chunk
+  type atom = space FppTypes.atom
+  type output = (space, ann) FppTypes.output
+
+  structure Output = 
   struct
-    type t = space chunk
-
-    val eq = 
-      fn (TEXT s1, TEXT s2) => s1 = s2
-       | (SPACE w1, SPACE w2) => Kit.Space.eq (w1, w2)
-       | _ => false
-  end
-
-  structure Atom = 
-  struct
-    type t = space atom
-    val eq = 
-      fn (CHUNK c1, CHUNK c2) => Chunk.eq (c1, c2)
-       | (NEWLINE, NEWLINE) => true
-       | _ => false
-  end
-
-  structure Out = 
-  struct
-    type t = (space, ann) output
-
-    val rec eq = 
-      fn (NULL, NULL) => true
-       | (ATOM a1, ATOM a2) => Atom.eq (a1, a2)
-       | (ANN (ann1, o1), ANN (ann2, o2)) => Kit.Ann.eq (ann1, ann2) andalso eq (o1, o2)
-       | (SEQ (l1, r1), SEQ (l2, r2)) => eq (l1, l2) andalso eq (r1, r2)
-       | _ => false
-
     fun map f = 
       fn NULL => NULL
        | ATOM a => ATOM a
@@ -45,18 +19,6 @@ struct
 
     val zer = NULL
     val mul = SEQ
-  end
-
-  structure Layout = 
-  struct
-    datatype t = Flat | Break
-    val eq : t * t -> bool = op=
-  end
-
-  structure Failure =
-  struct
-    datatype t = CanFail | CantFail
-    val eq : t * t -> bool = op=
   end
 
   open Kit
@@ -166,7 +128,7 @@ struct
     getState >>= 
     (fn {curLine} => measure curLine)
 
-  fun chunk (c : space chunk) : unit m = 
+  fun chunk (c : chunk) : unit m = 
     output (ATOM (CHUNK c)) >> askEnv >>= 
     (fn {formatting,...} => 
       modifyLine (fn line => line @ [(c, formatting)]) >>
