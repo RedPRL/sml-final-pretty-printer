@@ -40,11 +40,6 @@ struct
 
   infix <$> 
 
-  fun <*> (mf, m) = 
-    mf >>= (fn f => f <$> m)
-
-  infix <*>
-
   fun sequence ms = 
     case ms of 
        [] => ret []
