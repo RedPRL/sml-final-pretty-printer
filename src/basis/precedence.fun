@@ -1,4 +1,4 @@
-functor FppPrecedenceBasis (B : FPP_BASIS where type space = int) : FPP_PRECEDENCE_BASIS = 
+functor FppPrecedenceBasis (B : FPP_BASIS) : FPP_PRECEDENCE_BASIS = 
 struct
   type space = B.space
   type ann = B.ann
@@ -121,28 +121,32 @@ struct
             parens m'
         end)
 
+    val oneSpace : unit m = 
+      lift Fpp.spaceWidth >>= 
+        lift o Fpp.space
+
     fun inf i mOp m1 m2 = 
       atLevel i @@ 
         bump m1 >>
-        lift (Fpp.space 1) >>
+        oneSpace >>
         mOp >>
-        lift (Fpp.space 1) >>
+        oneSpace >>
         bump m2
 
     fun infl i mOp m1 m2 = 
       atLevel i @@
         m1 >> 
-        lift (Fpp.space 1) >>
+        oneSpace >>
         mOp >> 
-        lift (Fpp.space 1) >>
+        oneSpace >>
         bump m2
 
     fun infr i mOp m1 m2 = 
       atLevel i @@
         bump m1 >> 
-        lift (Fpp.space 1) >>
+        oneSpace >>
         mOp >> 
-        lift (Fpp.space 1) >>
+        oneSpace >>
         m2
 
     fun app m ms = 
