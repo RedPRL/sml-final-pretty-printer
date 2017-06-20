@@ -1,4 +1,6 @@
 Group is
   $/basis.cm
+  src/types.sml
   src/final.sig
+  src/basis.sig
   src/final.fun
