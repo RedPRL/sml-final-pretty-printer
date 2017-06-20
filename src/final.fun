@@ -221,4 +221,13 @@ struct
 
   fun expr m =
     align (grouped m)
+
+  structure Atomic =
+  struct
+    val equals = char #"="
+    fun parens m = char #"(" >> m >> char #")"
+    fun braces m = char #"{" >> m >> char #"}"
+    val colon = char #":"
+    val comma  = char #","
+  end
 end

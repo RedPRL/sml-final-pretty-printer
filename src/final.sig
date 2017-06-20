@@ -30,4 +30,15 @@ sig
   val collection : unit m -> unit m -> unit m -> unit m list -> unit m
 
   val expr : 'a m -> 'a m
+
+
+  (* convenience *)
+  structure Atomic :
+  sig
+    val equals : unit m
+    val parens : unit m -> unit m
+    val braces : unit m -> unit m
+    val colon : unit m
+    val comma : unit m
+  end
 end
