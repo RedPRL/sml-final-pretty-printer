@@ -1,5 +1,6 @@
 (* based on https://github.com/purescript/purescript-transformers/blob/master/src/Control/Monad/RWS/Trans.purs *)
 
+(* TODO: turn this into a monad transformer... *)
 functor FppInitialBasis (Types : FPP_BASIS_TYPES where type space = int) : FPP_BASIS = 
 struct
   open FppTypes
