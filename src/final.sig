@@ -4,10 +4,6 @@ sig
   type ann
   type 'a m
 
-  type chunk = space FppTypes.chunk
-  type atom = space FppTypes.atom
-  type output = (space, ann) FppTypes.output
-
   val grouped : 'a m -> 'a m
   val text : string -> unit m
   val char : char -> unit m
