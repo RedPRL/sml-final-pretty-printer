@@ -1,0 +1,26 @@
+Library
+  signature FPP
+  signature FPP_BASIS_TYPES
+  signature FPP_BASIS
+  signature FPP_PRECEDENCE_BASIS
+
+  structure FppTypes
+  structure FppPlainBasisTypes
+  structure FppRenderPlainText
+
+  functor FinalPrettyPrinter
+  functor FppInitialBasis
+  functor FppPrecedenceBasis
+is
+  $/basis.cm
+  src/types.sml
+  src/final.sig
+  src/basis.sig
+  src/final.fun
+  src/basis/initial.fun
+  src/basis/precedence.sig
+  src/basis/precedence.fun
+  src/basis/types/plain.sml
+  src/render/plain_text.sig
+  src/render/plain_text.sml
+  
