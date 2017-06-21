@@ -62,59 +62,25 @@ struct
          FLAT => flatAction
        | BREAK => breakAction)
 
-  fun makeFlat m = 
+  fun makeFlatAndAllowFail m = 
     localEnv
       (fn {maxWidth, maxRibbon, nesting, layout, failure, formatting, formatAnn} =>
-         {maxWidth = maxWidth,
-          maxRibbon = maxRibbon,
-          nesting = nesting,
-          layout = FLAT,
-          failure = failure,
-          formatting = formatting,
-          formatAnn = formatAnn})
+        {maxWidth = maxWidth, maxRibbon = maxRibbon, nesting = nesting, layout = FLAT, failure = CAN_FAIL, formatting = formatting, formatAnn = formatAnn})
       m
 
-  fun allowFail m = 
+  fun localNesting f = 
     localEnv
       (fn {maxWidth, maxRibbon, nesting, layout, failure, formatting, formatAnn} =>
-         {maxWidth = maxWidth,
-          maxRibbon = maxRibbon,
-          nesting = nesting,
-          layout = layout,
-          failure = CAN_FAIL,
-          formatting = formatting,
-          formatAnn = formatAnn})
-      m
+        {maxWidth = maxWidth, maxRibbon = maxRibbon, nesting = f nesting, layout = layout, failure = failure, formatting = formatting, formatAnn = formatAnn})
 
-  fun localNesting f m = 
+  fun localFormatting f = 
     localEnv
       (fn {maxWidth, maxRibbon, nesting, layout, failure, formatting, formatAnn} =>
-         {maxWidth = maxWidth,
-          maxRibbon = maxRibbon,
-          nesting = f nesting,
-          layout = layout,
-          failure = failure,
-          formatting = formatting,
-          formatAnn = formatAnn})
-      m
-
-  fun localFormatting f m = 
-    localEnv
-      (fn {maxWidth, maxRibbon, nesting, layout, failure, formatting, formatAnn} =>
-         {maxWidth = maxWidth,
-          maxRibbon = maxRibbon,
-          nesting = nesting,
-          layout = layout,
-          failure = failure,
-          formatting = f formatting,
-          formatAnn = formatAnn})
-      m
-
+        {maxWidth = maxWidth,maxRibbon = maxRibbon, nesting = nesting, layout = layout, failure = failure, formatting = f formatting, formatAnn = formatAnn})
 
   fun modifyLine f = 
     modifyState 
       (fn {curLine} => {curLine = f curLine})
-
 
   fun putCurrentLine l = 
     modifyLine (fn _ => l)
@@ -141,7 +107,7 @@ struct
              when shouldFail (fail ())
            end))
 
-  fun grouped m = ifFlat m (makeFlat (allowFail m) <|> m)
+  fun grouped m = ifFlat m (makeFlatAndAllowFail m <|> m)
   val text = chunk o TEXT 
   val char = text o Char.toString
   val space = chunk o SPACE
@@ -176,7 +142,7 @@ struct
 
   fun intersperse s xs = 
     case xs of 
-      [] => []
+       [] => []
      | [x] => [x]
      | x::xs => x :: s :: intersperse s xs
 

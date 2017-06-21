@@ -26,7 +26,10 @@ struct
     type env = M.env
     type line = M.line
 
+    fun lift m _ = m
+
     fun ret a _ = M.ret a
+
     fun bind m f p = 
       M.bind (m p) (fn a => f a p)
 
@@ -57,12 +60,6 @@ struct
     fun modifyState f _ = 
       M.modifyState f
 
-    fun localLevel f m {level, bumped, lparen, rparen} = 
-      m {level = f level, bumped = bumped, lparen = lparen, rparen = rparen}
-
-    fun localBumped f m {level, bumped, lparen, rparen} = 
-      m {level = level, bumped = f bumped, lparen = lparen, rparen = rparen}
-
     fun askPrec p : prec_env M.m = 
       M.ret p
 
@@ -72,48 +69,36 @@ struct
 
   local
     open Monad
-    fun >>= (m, f) = 
-        bind m f
-    infix 2 >>=
 
-    fun >> (m, n) = 
-        m >>= (fn _ => n)
-    infix 2 >>
-
-    val <|> = alt
-    infixr <|>
-
-    fun <$> (f, m) = 
-        m >>= (ret o f)
-
-    infix <$>
+    fun >>= (m, f) = bind m f
+    fun >> (m, n) = bind m (fn _ => n)
+    infix 2 >>= >>
 
     fun @@ (f, x) = f x
     infixr 0 @@
 
-    fun lift m _ = m
-
     structure Fpp = FinalPrettyPrinter (B)
   in
-    fun botLevel m =
-      localLevel (fn _ => 0) (localBumped (fn _ => false) m)
+    fun botLevel m {level, bumped, lparen, rparen} =
+      m {level = 0, bumped = false, lparen = lparen, rparen = rparen}
     
-    fun bump m = localBumped (fn _ => true) m
+    fun bump m {level, bumped, lparen, rparen} =
+      m {level = level, bumped = true, lparen = lparen, rparen = rparen}
 
     fun closed lm m rm : 'a m= 
       lm >> botLevel m >> rm
 
-    fun parens (m : 'a m) : 'a m =
+    fun parens m =
       closed
         (fn {lparen = (lp, SOME ann),...} => Fpp.annotate ann (Fpp.text lp) | {lparen = (lp, NONE),...} => Fpp.text lp)
         (fn {rparen = (rp, SOME ann),...} => Fpp.annotate ann (Fpp.text rp) | {rparen = (rp, NONE),...} => Fpp.text rp)
         m
 
-    fun atLevel i' (m : 'a m) : 'a m = 
+    fun atLevel i' m = 
       askPrec >>=
       (fn {level = i, bumped, ...} => 
         let
-          val m' = localLevel (fn _ => i') (localBumped (fn _ => false) m)
+          fun m' {level, bumped, lparen, rparen} = m {level = i', bumped = false, lparen = lparen, rparen = rparen}
         in
           if i < i' orelse (i = i' andalso not bumped) then 
             m'
