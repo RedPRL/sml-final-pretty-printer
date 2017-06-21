@@ -12,7 +12,7 @@ struct
      lparen : string * ann option,
      rparen : string * ann option}
   
-  val epsilon : prec_env = 
+  val emptyPrecEnv : prec_env = 
     {level = 0,
      bumped = false,
      lparen = ("(", NONE),
@@ -65,10 +65,10 @@ struct
 
   end
 
-  type 'a expr =
-    {opr : 'a Monad.m,
-     arg1 : 'a Monad.m,
-     arg2 : 'a Monad.m}
+  type expr =
+    {opr : unit Monad.m,
+     arg1 : unit Monad.m,
+     arg2 : unit Monad.m}
 
   type level = int 
   datatype assoc = LEFT | RIGHT | NON_ASSOC
@@ -91,16 +91,16 @@ struct
     fun bump m {level, bumped, lparen, rparen} =
       m {level = level, bumped = true, lparen = lparen, rparen = rparen}
 
-    fun closed lm m rm : 'a m= 
+    fun closed lm m rm : unit m= 
       lm >> botLevel m >> rm
 
     fun parens m =
       closed
         (fn {lparen = (lp, SOME ann),...} => Fpp.annotate ann (Fpp.text lp) | {lparen = (lp, NONE),...} => Fpp.text lp)
-        (fn {rparen = (rp, SOME ann),...} => Fpp.annotate ann (Fpp.text rp) | {rparen = (rp, NONE),...} => Fpp.text rp)
         m
+        (fn {rparen = (rp, SOME ann),...} => Fpp.annotate ann (Fpp.text rp) | {rparen = (rp, NONE),...} => Fpp.text rp)
 
-    fun atLevel i' m = 
+    fun atLevel (i' : level) (m : unit m)= 
       askPrec >>=
       (fn {level = i, bumped, ...} => 
         let
