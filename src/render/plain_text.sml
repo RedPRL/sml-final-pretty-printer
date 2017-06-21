@@ -21,4 +21,16 @@ struct
           render h out2)
      | T.ANN (_, out) => 
          render h out
+
+  val rec toString = 
+    fn T.NULL => ""
+     | T.ATOM a => toStringAtom a
+
+  and toStringAtom = 
+    fn T.CHUNK c => toStringChunk c
+     | T.NEWLINE => "\n"
+
+  and toStringChunk = 
+    fn T.TEXT txt => txt
+     | T.SPACE w => String.implode (List.tabulate (w, fn _ => #" "))
 end
