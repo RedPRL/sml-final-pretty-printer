@@ -25,6 +25,8 @@ struct
   val rec toString = 
     fn T.NULL => ""
      | T.ATOM a => toStringAtom a
+     | T.SEQ (out1, out2) => toString out1 ^ toString out2
+     | T.ANN (_, out) => toString out
 
   and toStringAtom = 
     fn T.CHUNK c => toStringChunk c
