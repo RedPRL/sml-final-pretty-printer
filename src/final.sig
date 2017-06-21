@@ -13,8 +13,6 @@ sig
   val nest : space -> 'a m -> 'a m
 
   val ifFlat : 'a m -> 'a m -> 'a m
-  val makeFlat : 'a m -> 'a m
-  val allowFail : 'a m -> 'a m
   val align : 'a m -> 'a m
   val annotate : ann -> 'a m -> 'a m
 
