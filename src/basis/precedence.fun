@@ -65,7 +65,13 @@ struct
 
   end
 
-  type 'a infixer = int -> 'a Monad.m -> 'a Monad.m -> 'a Monad.m -> 'a Monad.m
+  type 'a expr =
+    {opr : 'a Monad.m,
+     arg1 : 'a Monad.m,
+     arg2 : 'a Monad.m}
+
+  type level = int 
+  datatype assoc = LEFT | RIGHT | NON_ASSOC
 
   local
     open Monad
@@ -110,29 +116,21 @@ struct
       lift Fpp.spaceWidth >>= 
         lift o Fpp.space
 
-    fun inf i mOp m1 m2 = 
-      atLevel i @@ 
-        bump m1 >>
-        oneSpace >>
-        mOp >>
-        oneSpace >>
-        bump m2
-
-    fun infl i mOp m1 m2 = 
-      atLevel i @@
-        m1 >> 
-        oneSpace >>
-        mOp >> 
-        oneSpace >>
-        bump m2
-
-    fun infr i mOp m1 m2 = 
-      atLevel i @@
-        bump m1 >> 
-        oneSpace >>
-        mOp >> 
-        oneSpace >>
-        m2
+    fun inf lvl assoc {opr, arg1, arg2} = 
+      let
+        val (arg1', arg2') = 
+          case assoc of 
+             LEFT => (arg1, bump arg2)
+           | RIGHT => (bump arg1, arg2)
+           | NON_ASSOC => (arg1, arg2)
+      in
+        atLevel lvl @@
+          arg1' >>
+          oneSpace >>
+          opr >> 
+          oneSpace >>
+          arg2'
+      end
 
     fun app m ms = 
       atLevel 100 (fn p => Fpp.hvsep (m p :: List.map (Fpp.align o (fn m => bump m p)) ms))
