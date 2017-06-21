@@ -11,6 +11,20 @@ struct
   fun @@ (f, x) = f x
   infixr 0 @@
 
+  local 
+    val initialEnv =
+      {maxWidth = 80,
+       maxRibbon = 60,
+       layout = FppTypes.BREAK,
+       failure = FppTypes.CANT_FAIL,
+       nesting = 0,
+       formatting = (),
+       formatAnn = fn _ => ()}
+  in
+    fun execPP (m : unit m)  = 
+      #output @@ m emptyPrecEnv initialEnv {curLine = []}
+  end
+
   val rec ppTm : tm -> unit m = 
     fn VAR x => text x
      | LAM (x, t) =>
@@ -20,19 +34,6 @@ struct
      | APP (t1, t2) => 
          app (ppTm t1) [ppTm t2]
 
-  val example : tm = LAM ("x", APP (VAR "x", APP (VAR "x", VAR "x")))
-
-  val env : (int, unit, unit) FppTypes.env =
-    {maxWidth = 80,
-     maxRibbon = 60,
-     layout = FppTypes.BREAK,
-     failure = FppTypes.CANT_FAIL,
-     nesting = 0,
-     formatting = (),
-     formatAnn = fn _ => ()}
-
-  val state = {curLine = []}
-
-  val welp = #output @@ ppTm example emptyPrecEnv env state
-  val hmm = Render.render TextIO.stdOut welp
+  val example = LAM ("x", APP (VAR "x", APP (VAR "x", VAR "x"))) 
+  val () = Render.render TextIO.stdOut o execPP @@ ppTm example
 end
