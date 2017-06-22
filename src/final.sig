@@ -38,6 +38,7 @@ sig
     val equals : unit m
     val parens : unit m -> unit m
     val braces : unit m -> unit m
+    val squares : unit m -> unit m
     val colon : unit m
     val comma : unit m
   end
