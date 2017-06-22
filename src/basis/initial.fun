@@ -30,7 +30,7 @@ struct
         val {state = state', result, output} = m env state
       in
         case Option.map f result of 
-           NONE => raise Match
+           NONE => {state = state', result = NONE, output = output}
          | SOME m' => 
            let
              val {state = state'', result = result', output = output'} = m' env state'
