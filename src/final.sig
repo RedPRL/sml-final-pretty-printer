@@ -16,6 +16,7 @@ sig
   val align : 'a m -> 'a m
   val annotate : ann -> 'a m -> 'a m
 
+  val empty : unit m
   val seq : unit m list -> unit m
 
   val hsep : unit m list -> unit m
