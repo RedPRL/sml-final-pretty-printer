@@ -146,6 +146,7 @@ struct
      | [x] => [x]
      | x::xs => x :: s :: intersperse s xs
 
+  val seq = sequence_
   val hsep = sequence_ o intersperse (text " ")
   val vsep = sequence_ o intersperse newline
 

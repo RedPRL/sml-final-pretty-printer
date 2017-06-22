@@ -16,6 +16,8 @@ sig
   val align : 'a m -> 'a m
   val annotate : ann -> 'a m -> 'a m
 
+  val seq : unit m list -> unit m
+
   val hsep : unit m list -> unit m
   val vsep : unit m list -> unit m
   val measureText : string -> space m
