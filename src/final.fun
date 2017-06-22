@@ -92,21 +92,19 @@ struct
 
   fun chunk (c : chunk) : unit m = 
     output (ATOM (CHUNK c)) >> askEnv >>= 
-    (fn {formatting,...} => 
+    (fn {formatting, failure, maxWidth, maxRibbon, nesting, ...} => 
       modifyLine (fn line => line @ [(c, formatting)]) >>
-      askEnv) >>=
-    (fn {failure, maxWidth, maxRibbon, nesting, ...} => 
-      when (failure = CAN_FAIL) @@
+      (when (failure = CAN_FAIL) @@
         measureCurrentLine >>=
         (fn w =>
-           let
-             val width = Space.sum (nesting, w)
-             val shouldFail = 
-               Space.compare (width, maxWidth) = GREATER
-                 orelse Space.compare (w, maxRibbon) = GREATER
-           in
-             when shouldFail (fail ())
-           end))
+          let
+            val width = Space.sum (nesting, w)
+            val shouldFail = 
+              Space.compare (width, maxWidth) = GREATER
+                orelse Space.compare (w, maxRibbon) = GREATER
+          in
+            when shouldFail (fail ())
+          end)))
 
   fun grouped m = ifFlat m (makeFlatAndAllowFail m <|> m)
   val text = chunk o TEXT 
