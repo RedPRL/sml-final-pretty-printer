@@ -4,6 +4,9 @@ sig
   type ann
   type 'a m
 
+  val ret : 'a -> 'a m
+  val bind : 'a m -> ('a -> 'b m) -> 'b m
+
   val grouped : 'a m -> 'a m
   val text : string -> unit m
   val char : char -> unit m
