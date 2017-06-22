@@ -35,7 +35,7 @@ struct
            let
              val {state = state'', result = result', output = output'} = m' env state'
            in
-             {state = state',
+             {state = state'',
               result = result',
               output = SEQ (output, output')}
            end
