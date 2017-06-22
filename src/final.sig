@@ -3,35 +3,36 @@ sig
   type space
   type ann
   type 'a m
+  type doc = unit m
 
   val ret : 'a -> 'a m
   val bind : 'a m -> ('a -> 'b m) -> 'b m
 
   val grouped : 'a m -> 'a m
-  val text : string -> unit m
-  val char : char -> unit m
-  val space : space -> unit m
-  val hardLine : unit m
-  val newline : unit m
+  val text : string -> doc
+  val char : char -> doc
+  val space : space -> doc
+  val hardLine : doc
+  val newline : doc
   val nest : space -> 'a m -> 'a m
 
   val ifFlat : 'a m -> 'a m -> 'a m
   val align : 'a m -> 'a m
   val annotate : ann -> 'a m -> 'a m
 
-  val empty : unit m
-  val seq : unit m list -> unit m
+  val empty : doc
+  val seq : doc list -> doc
 
-  val hsep : unit m list -> unit m
-  val vsep : unit m list -> unit m
+  val hsep : doc list -> doc
+  val vsep : doc list -> doc
   val measureText : string -> space m
   val spaceWidth : space m
   val emWidth : space m
 
-  val hvsep : unit m list -> unit m
-  val hsepTight : unit m list -> unit m
-  val hvsepTight : unit m list -> unit m
-  val collection : unit m -> unit m -> unit m -> unit m list -> unit m
+  val hvsep : doc list -> doc
+  val hsepTight : doc list -> doc
+  val hvsepTight : doc list -> doc
+  val collection : doc -> doc -> doc -> doc list -> doc
 
   val expr : 'a m -> 'a m
 
@@ -39,11 +40,11 @@ sig
   (* convenience *)
   structure Atomic :
   sig
-    val equals : unit m
-    val parens : unit m -> unit m
-    val braces : unit m -> unit m
-    val squares : unit m -> unit m
-    val colon : unit m
-    val comma : unit m
+    val equals : doc
+    val parens : doc -> doc
+    val braces : doc -> doc
+    val squares : doc -> doc
+    val colon : doc
+    val comma : doc
   end
 end

@@ -2,7 +2,8 @@ functor FinalPrettyPrinter (Kit : FPP_BASIS) : FPP =
 struct
   open Kit
   type 'a m = 'a Kit.Monad.m
-
+  type doc = unit m
+  
   open FppTypes
 
   type chunk = space FppTypes.chunk
