@@ -79,16 +79,22 @@ struct
       (fn {maxWidth, maxRibbon, nesting, layout, failure, formatting, formatAnn} =>
         {maxWidth = maxWidth,maxRibbon = maxRibbon, nesting = nesting, layout = layout, failure = failure, formatting = f formatting, formatAnn = formatAnn})
 
-  fun modifyLine f = 
-    modifyState 
-      (fn {curLine} => {curLine = f curLine})
+  fun spaceMax (w, w') = 
+    if Space.compare (w, w') = GREATER then w else w'
+    
+  (* TODO: aquaMax ;-) *)
 
-  fun putCurrentLine l = 
-    modifyLine (fn _ => l)
+  fun putCurrentLine l : unit m = 
+    measure l >>= (fn w => 
+      modifyState (fn {maxWidthSeen = w', ...} => {maxWidthSeen = spaceMax (w, w'), curLine = l}))
+
+  fun modifyLine f =
+    getState >>= (fn {curLine, ...} => 
+      putCurrentLine (f curLine))
 
   val measureCurrentLine =
     getState >>= 
-    (fn {curLine} => measure curLine)
+    (fn {curLine, ...} => measure curLine)
 
   fun chunk (c : chunk) : unit m = 
     output (ATOM (CHUNK c)) >> askEnv >>= 
