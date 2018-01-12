@@ -98,10 +98,9 @@ struct
         measureCurrentLine >>=
         (fn w =>
           let
-            val width = Space.sum (nesting, w)
             val shouldFail = 
-              Space.compare (width, maxWidth) = GREATER
-                orelse Space.compare (w, maxRibbon) = GREATER
+              Space.compare (w, maxWidth) = GREATER
+                orelse Space.compare (Space.sum (w, Space.neg nesting), maxRibbon) = GREATER
           in
             when shouldFail (fail ())
           end)))
