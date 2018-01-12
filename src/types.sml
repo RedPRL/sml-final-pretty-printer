@@ -27,7 +27,7 @@ struct
    | SEQ of ('w, 'ann) output * ('w, 'ann) output
 
   type ('w, 'fmt) line = ('w chunk * 'fmt) list
-  type ('w, 'fmt) state = {curLine : ('w, 'fmt) line}
+  type ('w, 'fmt) state = {curLine : ('w, 'fmt) line, maxWidthSeen : 'w}
 
   datatype layout = FLAT | BREAK
   datatype failure = CAN_FAIL | CANT_FAIL
